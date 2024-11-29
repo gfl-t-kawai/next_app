@@ -1,33 +1,52 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from '@/components/common/Button';
-
-type Product = {
-  id: string;
-  name: string;
-  image: string;
-  description: string;
-  price: number;
-  stock: number;
-};
+import { Product } from '../../types/product';
+import { getProductById } from '@/services/productService';
 
 type ProductDetailsProps = {
-  product: Product;
+  productId: number;
 };
 
-export const ProductDetails = ({ product }: ProductDetailsProps) => {
+export const ProductDetails = ({ productId }: ProductDetailsProps) => {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const fetchedProduct = await getProductById(productId);
+        setProduct(fetchedProduct);
+      } catch {
+        setError('Failed to fetch product details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+  
   const handleAddToCart = () => {
-    console.log(`Product ${product.id} added to cart`);
+    if (product) {
+      console.log(`Product ${product.id} added to cart`);
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <Container>
-      <Image src={product.image} alt={product.name} />
+      <Image src={product?.image} alt={product?.name} />
       <Info>
-        <h1>{product.name}</h1>
-        <p>{product.description}</p>
-        <p>Price: ${product.price.toFixed(2)}</p>
-        <p>{product.stock > 0 ? `In Stock` : `Out of Stock`}</p>
-        <Button onClick={handleAddToCart}>Add to Cart</Button>
+        <h1>{product?.name}</h1>
+        <p>{product?.description}</p>
+        <p>価格: {product?.price ? new Intl.NumberFormat().format(product.price) : 0}円</p>
+        <p>{product?.stock ?? 0 > 0 ? `In Stock` : `Out of Stock`}</p>
+        <Button onClick={handleAddToCart}>カートに追加</Button>
       </Info>
     </Container>
   );

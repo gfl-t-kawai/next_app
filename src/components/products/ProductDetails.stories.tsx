@@ -1,46 +1,67 @@
-import React from 'react';
 import { Meta, StoryFn } from '@storybook/react';
 import { ProductDetails } from './ProductDetails';
+import { http, HttpResponse } from 'msw';
+import { mswDecorator } from 'msw-storybook-addon';
 
 export default {
-  title: 'Components/ProductDetails',
+  title: 'Components/Products/ProductDetails',
   component: ProductDetails,
+  decorators: [mswDecorator],
+  parameters: {
+    msw: {
+      handlers: [
+        // モックデータの設定
+        http.get('http://localhost:6006/api/products/:id',({ params }) =>  {
+          const { id } = params;
+          console.log('Intercepted request with params:', params);
+          if (id == '1') {
+            return HttpResponse.json(
+              {
+                id: 1,
+                name: 'サンプル商品',
+                description: 'This is a sample product description.',
+                price: 2990,
+                stock: 10,
+                image: '/images/dummy.png',
+              },
+              { status: 200 }
+            );
+          }
+          return new HttpResponse('Product not found', { status: 404 });
+        }),
+      ],
+    },
+  },
 } as Meta<typeof ProductDetails>;
 
-const Template: StoryFn<typeof ProductDetails> = (args) => <ProductDetails {...args} />;
+// Template 定義
+const Template: StoryFn<{ productId: number }> = (args) => {
+  return <ProductDetails productId={args.productId} />;
+};
 
+// ストーリー定義
+
+/** 正常データ取得ストーリー */
 export const Default = Template.bind({});
 Default.args = {
-  product: {
-    id: '1',
-    name: 'Sample Product',
-    image: '/images/asgnbwkpuwtlo2sbfp1a.png',
-    description: 'This is a sample product description.',
-    price: 29.99,
-    stock: 10,
-  },
+  productId: 1, // 正常データ
 };
 
-export const OutOfStock = Template.bind({});
-OutOfStock.args = {
-  product: {
-    id: '2',
-    name: 'Out of Stock Product',
-    image: '/images/cswcnngmwthcr1o6qgxr.png',
-    description: 'This product is currently out of stock.',
-    price: 49.99,
-    stock: 0,
-  },
+/** エラー発生ストーリー */
+export const Error = Template.bind({});
+Error.args = {
+  productId: 99, // 存在しない ID によるエラー
 };
 
-export const ExpensiveProduct = Template.bind({});
-ExpensiveProduct.args = {
-  product: {
-    id: '3',
-    name: 'Luxury Item',
-    image: '/images/xhxbjzqmfaa4et8q63bo.png',
-    description: 'A high-end luxury item with premium features.',
-    price: 999.99,
-    stock: 5,
+/** ローディング状態ストーリー */
+export const Loading = Template.bind({});
+Loading.parameters = {
+  msw: {
+    handlers: [
+      http.get('http://localhost:6006/api/products/:id', () => {
+        // ローディング状態をシミュレート（2秒遅延）
+        return new Promise(() => {}); // 無限プロミスでローディング状態を再現
+      }),
+    ],
   },
 };
