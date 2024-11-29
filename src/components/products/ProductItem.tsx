@@ -1,24 +1,37 @@
-import Link from 'next/link';
-import { Button } from '../common/Button';
-import { Card } from '../common/Card';
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "../common/Button";
+import { Card } from "../common/Card";
+import styled from "styled-components";
+import { Product } from "@/types/product";
 
 type ProductItemProps = {
-  id: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-  onAddToCart: (id: number) => void;
+  product: Product;
+  onAddToCart: (productId: number) => void; // カート追加関数を受け取る
 };
 
-export const ProductItem: React.FC<ProductItemProps> = ({ id, name, price, imageUrl, onAddToCart }) => {
+export const ProductItem = ({ product, onAddToCart }: ProductItemProps) => {
   return (
     <Card>
-      <Link href={`/product/${id}`}>
-        <img src={imageUrl} alt={name} style={{ width: '100%', height: 'auto', cursor: 'pointer' }} />
-      </Link>
-      <h3>{name}</h3>
-      <p>{`¥${price.toLocaleString()}`}</p>
-      <Button onClick={() => onAddToCart(id)}>カートに追加</Button>
+      <Info>
+        <Link href={`/product/${product.id}`}>
+          <Image
+            src={product.image}
+            alt={product.name}
+            width={150}
+            height={150}
+            priority
+          />
+        </Link>
+        <h3>{product.name}</h3>
+        <p>価格: {product?.price ? new Intl.NumberFormat().format(product.price) : 0}円</p>
+        <Button onClick={() => onAddToCart(product.id)}>カートに追加</Button>
+      </Info>
     </Card>
   );
 };
+
+const Info = styled.div`
+  margin-top: 8px;
+  text-align: center;
+`;

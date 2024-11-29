@@ -1,23 +1,24 @@
 import { ProductItem } from './ProductItem';
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-};
+import { Product } from '@/types/product';
+import styled from 'styled-components';
 
 type ProductListProps = {
   products: Product[];
   onAddToCart: (id: number) => void;
 };
 
-export const ProductList: React.FC<ProductListProps> = ({ products, onAddToCart }) => {
+export const ProductList = ({ products, onAddToCart }: ProductListProps) => {
   return (
-    <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+    <ListContainer>
       {products.map((product) => (
-        <ProductItem key={product.id} {...product} onAddToCart={onAddToCart} />
+        <ProductItem key={product.id} product={product} onAddToCart={onAddToCart} />
       ))}
-    </div>
+    </ListContainer>
   );
 };
+
+const ListContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
