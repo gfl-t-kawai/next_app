@@ -8,11 +8,12 @@ const ProductPage = () => {
 
   if (!id) return <p>Loading...</p>;
 
-  const product = getProductById(id as string);
+  const productId = parseInt(id as string, 10);
+  const product = getProductById(productId);
 
   if (!product) return <p>Product not found</p>;
 
-  return <ProductDetails product={product} />;
+  return <ProductDetails productId={productId} />;
 };
 
 export default ProductPage;

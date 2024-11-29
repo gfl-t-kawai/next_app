@@ -1,24 +1,42 @@
-import { ProductList } from '../components/products/ProductList';
-import { useState } from 'react';
-
-const dummyProducts = [
-  { id: 1, name: '商品1', price: 1000, imageUrl: '/images/asgnbwkpuwtlo2sbfp1a.png' },
-  { id: 2, name: '商品2', price: 2000, imageUrl: '/images/cswcnngmwthcr1o6qgxr.png' },
-  { id: 3, name: '商品3', price: 3000, imageUrl: '/images/fiq17k43u7gnwkzlmorh.png' },
-];
+import { useEffect, useState } from 'react';
+import { getAllProducts } from '@/services/productService';
+import { ProductList } from '@/components/products/ProductList';
+import { Product } from '@/types/product';
 
 const HomePage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddToCart = (id: number) => {
-    setCart((prevCart) => [...prevCart, id]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch {
+        setError('Failed to fetch products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleAddToCart = (productId: number) => {
+    setCart((prevCart) => [...prevCart, productId]);
     alert('カートに追加しました');
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <div>
       <h1>商品一覧</h1>
-      <ProductList products={dummyProducts} onAddToCart={handleAddToCart} />
+      <ProductList products={products} onAddToCart={handleAddToCart} />
     </div>
   );
 };
