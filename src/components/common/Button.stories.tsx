@@ -1,10 +1,10 @@
 import { Meta, StoryObj } from '@storybook/react';
-import { Button } from './Button';
+import { Button, RemoveButton } from './Button';
 
 const meta: Meta<typeof Button> = {
   title: 'Common/Button',
   component: Button,
-  tags: ['autodocs'], // 自動ドキュメント化用
+  tags: ['autodocs'],
   argTypes: {
     onClick: { action: 'clicked' },
   },
@@ -27,3 +27,26 @@ export const Disabled: Story = {
     onClick: () => {},
   },
 };
+
+export const LinkButton: Story = {
+  args: {
+    children: 'リンクボタン',
+    href: 'https://example.com', // リンク先URLを指定
+  },
+};
+
+// RemoveButton用のストーリーを追加
+const removeMeta: Meta<typeof RemoveButton> = {
+  title: 'Common/RemoveButton',
+  component: RemoveButton,
+  tags: ['autodocs'],
+};
+
+export const Remove: StoryObj<typeof RemoveButton> = {
+  args: {
+    children: '削除ボタン',
+    onClick: () => alert('削除ボタンがクリックされました'),
+  },
+};
+
+export { removeMeta as removeMeta };
