@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Button } from '@/components/common/Button';
 import { Product } from '../../types/product';
 import { getProductById } from '@/services/productService';
+import { useCart } from '@/hooks/useCart';
 
 type ProductDetailsProps = {
   productId: number;
@@ -12,6 +13,7 @@ export const ProductDetails = ({ productId }: ProductDetailsProps) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -31,6 +33,8 @@ export const ProductDetails = ({ productId }: ProductDetailsProps) => {
   
   const handleAddToCart = () => {
     if (product) {
+      const cartItem = { ...product, quantity: 1 };
+      addToCart(cartItem);
       console.log(`Product ${product.id} added to cart`);
     }
   };

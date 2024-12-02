@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { getAllProducts } from '@/services/productService';
 import { ProductList } from '@/components/products/ProductList';
 import { Product } from '@/types/product';
+import { useCart } from '@/hooks/useCart';
 
 const HomePage = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<number[]>([]);
+  const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,8 +27,13 @@ const HomePage = () => {
   }, []);
 
   const handleAddToCart = (productId: number) => {
-    setCart((prevCart) => [...prevCart, productId]);
-    alert('カートに追加しました');
+    const product = products.find(p => p.id === productId);
+    console.log('Selected product:', product); 
+    if (product) {
+      const cartItem = { ...product, quantity: 1 };
+      addToCart(cartItem);
+      alert('カートに追加しました');
+    }
   };
 
   if (loading) return <p>Loading...</p>;

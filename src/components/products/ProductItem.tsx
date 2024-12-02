@@ -16,7 +16,7 @@ export const ProductItem = ({ product, onAddToCart }: ProductItemProps) => {
       <Info>
         <Link href={`/product/${product.id}`}>
           <Image
-            src={product.image}
+            src={product.image ?? "/images/dummy.png"}
             alt={product.name}
             width={150}
             height={150}
